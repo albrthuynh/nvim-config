@@ -1,0 +1,6 @@
+*.lock
+*.log
+*.tmp
+*.backup
+plugin/packer_compiled.lua
+site/pack/*
