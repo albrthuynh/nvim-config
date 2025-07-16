@@ -1,6 +1,6 @@
 # 🌀 Neovim Configuration
 
-This is my personal Neovim configuration — optimized for development with modern tools, clean UI, and fast startup. Designed to work across macOS, Windows, and Linux.
+This is my personal Neovim configuration — optimized for development with modern tools, clean UI, and fast startup. Designed to work for my MacOS device.
 
 ---
 
