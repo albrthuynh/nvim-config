@@ -1,19 +1,17 @@
 return {
     "kawre/leetcode.nvim",
-    build = ":TSUpdate html", -- if you have nvim-treesitter installed
+    build = ":TSUpdate html",
     dependencies = {
-        -- picker dependency examples
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
+        "nvim-telescope/telescope.nvim", -- <— ensure this is installed
     },
-    cmd = { "LeetCode" }, -- loads plugin only when command is called
-    keys = {
-        { "<leader>lc", "<cmd>LeetCode<cr>", desc = "Open LeetCode menu" },
-    },
+    cmd = { "Leet" },
+    keys = { { "<leader>lc", "<cmd>Leet<cr>", desc = "Open LeetCode" } },
     opts = {
-        -- you can set your config here
-        lang = "python",
-        theme = "dark",
-        -- other config options from the plugin docs
+        lang = "python3",
+        picker = "telescope", -- <— tell leetcode.nvim which picker you’re using
+        plugins = { non_standalone = true }, -- lets you run inside a normal session
+        -- leave `theme` out for now
     },
 }
