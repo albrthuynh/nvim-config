@@ -37,6 +37,7 @@ return {
                 "emmet_ls",
                 "prismals",
                 "pyright",
+                "clangd",
             },
         })
 
@@ -48,6 +49,7 @@ return {
                 "black", -- python formatter
                 "pylint",
                 "eslint_d",
+                "cpplint", -- cpp/c formatter
             },
         })
     end,
