@@ -101,9 +101,10 @@ return {
             },
         })
 
-        -- Per-server config: clangd
+        -- Per-server config: clangd (hover, go-to-def, etc. for C/C++)
         vim.lsp.config("clangd", {
             capabilities = capabilities,
+            filetypes = { "c", "cpp", "objc", "objcpp" },
             cmd = {
                 "clangd",
                 "--background-index",
@@ -116,22 +117,18 @@ return {
             },
         })
 
-        -- Mason-LSPConfig v2: no setup_handlers; use ensure_installed + automatic_enable
+        -- Mason-LSPConfig v2: ensure installs; we enable servers explicitly (automatic_enable is unreliable on Neovim 0.11)
+        local servers = {
+            "ts_ls", "html", "cssls", "tailwindcss", "svelte", "lua_ls",
+            "graphql", "emmet_ls", "prismals", "pyright", "clangd",
+        }
         require("mason-lspconfig").setup({
-            ensure_installed = {
-                "ts_ls",
-                "html",
-                "cssls",
-                "tailwindcss",
-                "svelte",
-                "lua_ls",
-                "graphql",
-                "emmet_ls",
-                "prismals",
-                "pyright",
-                "clangd",
-            },
+            ensure_installed = servers,
             automatic_enable = true,
         })
+        -- Explicitly enable each server so they attach to buffers (required for Neovim 0.11)
+        for _, name in ipairs(servers) do
+            pcall(vim.lsp.enable, name)
+        end
     end,
 }
