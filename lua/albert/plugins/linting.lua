@@ -4,6 +4,14 @@ return {
     config = function()
         local lint = require("lint")
 
+        -- Disable pylint "missing docstring" warnings (C0114 = module, C0116 = function/method)
+        local lint = require("lint")
+        lint.linters.pylint = lint.linters.pylint or {}
+        local pylint_args = lint.linters.pylint.args or {}
+        lint.linters.pylint.args = vim.list_extend(pylint_args, {
+            "--disable=missing-module-docstring,missing-function-docstring",
+        })
+
         lint.linters_by_ft = {
             javascript = { "eslint_d" },
             typescript = { "eslint_d" },

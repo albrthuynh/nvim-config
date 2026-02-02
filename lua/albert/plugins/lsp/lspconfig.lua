@@ -5,134 +5,133 @@ return {
         "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
         { "folke/neodev.nvim", opts = {} },
-        -- Make sure these point to the current org (if not already updated)
-        -- "mason-org/mason.nvim",
-        -- "mason-org/mason-lspconfig.nvim",
+        "mason-org/mason.nvim",
+        "mason-org/mason-lspconfig.nvim",
     },
-    config = function()
-        local cmp_nvim_lsp = require("cmp_nvim_lsp")
-        local keymap = vim.keymap
 
-        -- Your LspAttach autocmd is perfect → keep it unchanged
+    config = function()
+        local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+        -- Short inline message; full message on hover (CursorHold opens float)
+        local max_inline = 50
+        vim.diagnostic.config({
+            signs = {
+                text = {
+                    [vim.diagnostic.severity.ERROR] = " ",
+                    [vim.diagnostic.severity.WARN] = " ",
+                    [vim.diagnostic.severity.HINT] = "󰠠 ",
+                    [vim.diagnostic.severity.INFO] = " ",
+                },
+                texthl = {
+                    [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+                    [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+                    [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+                    [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+                },
+            },
+            virtual_text = {
+                virt_text_pos = "eol_right_align", -- push message to the right edge of the window
+                format = function(diag)
+                    local msg = diag.message:gsub("\n", " "):gsub("%s+", " ")
+                    if #msg > max_inline then
+                        return msg:sub(1, max_inline) .. "…"
+                    end
+                    return msg
+                end,
+            },
+            underline = true,
+            update_in_insert = false,
+            severity_sort = true,
+        })
+
+        -- Show full diagnostic when cursor rests on a line with diagnostics
+        vim.opt.updatetime = 1000 -- CursorHold fires after this ms; keeps hover float responsive
+        local diag_group = vim.api.nvim_create_augroup("DiagnosticHover", { clear = true })
+        vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+            group = diag_group,
+            callback = function()
+                local bufnr = vim.api.nvim_get_current_buf()
+                local line = vim.api.nvim_win_get_cursor(0)[1] - 1
+                local diags = vim.diagnostic.get(bufnr, { lnum = line })
+                if #diags > 0 then
+                    vim.diagnostic.open_float({ scope = "line", focus = false })
+                end
+            end,
+        })
+
+        -- LspAttach keymaps
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
             callback = function(ev)
-                local opts = { buffer = ev.buf, silent = true }
-                opts.desc = "Show LSP references"
-                keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
-                opts.desc = "Go to declaration"
-                keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-                opts.desc = "Show LSP definitions"
-                keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
-                opts.desc = "Show LSP implementations"
-                keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
-                opts.desc = "Show LSP type definitions"
-                keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
-                opts.desc = "See available code actions"
-                keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-                opts.desc = "Smart rename"
-                keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-                opts.desc = "Show buffer diagnostics"
-                keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
-                opts.desc = "Show line diagnostics"
-                keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
-                opts.desc = "Go to previous diagnostic"
-                keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-                opts.desc = "Go to next diagnostic"
-                keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-                opts.desc = "Show documentation for what is under cursor"
-                keymap.set("n", "K", vim.lsp.buf.hover, opts)
-                opts.desc = "Restart LSP"
-                keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
+                local opts = { buffer = ev.buf }
+                local map = function(keys, func, desc)
+                    vim.keymap.set("n", keys, func, vim.tbl_extend("force", opts, { desc = desc }))
+                end
+                map("gR", "<cmd>Telescope lsp_references<CR>", "Show LSP references")
+                map("gD", vim.lsp.buf.declaration, "Go to declaration")
+                map("gd", "<cmd>Telescope lsp_definitions<CR>", "Show LSP definitions")
+                map("gi", "<cmd>Telescope lsp_implementations<CR>", "Show implementations")
+                map("gt", "<cmd>Telescope lsp_type_definitions<CR>", "Show type definitions")
+                map("<leader>ca", vim.lsp.buf.code_action, "Code actions (n/v)")
+                map("<leader>rn", vim.lsp.buf.rename, "Smart rename")
+                map("<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", "Buffer diagnostics")
+                map("<leader>d", vim.diagnostic.open_float, "Line diagnostics")
+                map("[d", vim.diagnostic.goto_prev, "Prev diagnostic")
+                map("]d", vim.diagnostic.goto_next, "Next diagnostic")
+                map("K", vim.lsp.buf.hover, "Hover documentation")
+                map("<leader>rs", ":LspRestart<CR>", "Restart LSP")
             end,
         })
 
-        -- Capabilities (unchanged)
-        local capabilities = cmp_nvim_lsp.default_capabilities()
-
-        -- Diagnostic signs (unchanged)
-        local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-        for type, icon in pairs(signs) do
-            local hl = "DiagnosticSign" .. type
-            vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-        end
-
-        -- ──────────────────────────────────────────────────────────────
-        -- New pattern: automatic_enable + manual vim.lsp.config overrides
-        -- ──────────────────────────────────────────────────────────────
-
-        -- Let mason-lspconfig auto-enable all installed servers
-        -- (calls vim.lsp.enable() behind the scenes using nvim-lspconfig defaults)
-        require("mason-lspconfig").setup({
-            ensure_installed = {
-                -- Add your servers here if you want auto-install
-                -- "lua_ls", "clangd", "jdtls", "svelte", "graphql", "emmet_ls",
-                -- ...
-            },
-            automatic_enable = true, -- default anyway, but explicit is good
-            -- If you ever need to exclude one (e.g. special plugin handles it):
-            -- automatic_enable = { exclude = { "rust_analyzer" } }
+        -- Default capabilities for all LSP servers (Neovim 0.11 vim.lsp.config API)
+        vim.lsp.config("*", {
+            capabilities = capabilities,
         })
 
-        -- Now override/extend only the servers that need custom config
-        -- (these merge on top of nvim-lspconfig's defaults)
-
-        vim.lsp.config("jdtls", {
-            -- root_dir already good in defaults usually; keep if needed
-            root_dir = function(fname)
-                return require("lspconfig.util").root_pattern("pom.xml", "gradlew", ".git")(fname)
-            end,
-            -- add any other jdtls-specific settings here
-        })
-
-        vim.lsp.config("clangd", {
-            cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed" },
-            filetypes = { "c", "cpp", "objc", "objcpp" },
-            root_dir = function(fname)
-                return require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt", ".git")(
-                    fname
-                )
-            end,
-        })
-
-        vim.lsp.config("svelte", {
-            on_attach = function(client, bufnr)
-                vim.api.nvim_create_autocmd("BufWritePost", {
-                    pattern = { "*.js", "*.ts" },
-                    callback = function(ctx)
-                        client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-                    end,
-                })
-            end,
-        })
-
-        vim.lsp.config("graphql", {
-            filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-        })
-
-        vim.lsp.config("emmet_ls", {
-            filetypes = {
-                "html",
-                "typescriptreact",
-                "javascriptreact",
-                "css",
-                "sass",
-                "scss",
-                "less",
-                "svelte",
-            },
-        })
-
+        -- Per-server config: lua_ls
         vim.lsp.config("lua_ls", {
+            capabilities = capabilities,
             settings = {
                 Lua = {
                     diagnostics = { globals = { "vim" } },
                     completion = { callSnippet = "Replace" },
+                    workspace = { checkThirdParty = false },
+                    telemetry = { enable = false },
                 },
             },
         })
 
-        -- If you have other servers with no overrides → nothing needed!
-        -- They get auto-enabled with good defaults if installed via Mason.
+        -- Per-server config: clangd
+        vim.lsp.config("clangd", {
+            capabilities = capabilities,
+            cmd = {
+                "clangd",
+                "--background-index",
+                "--clang-tidy",
+                "--header-insertion=iwyu",
+                "--completion-style=detailed",
+            },
+            init_options = {
+                fallbackFlags = { "--std=c++23" },
+            },
+        })
+
+        -- Mason-LSPConfig v2: no setup_handlers; use ensure_installed + automatic_enable
+        require("mason-lspconfig").setup({
+            ensure_installed = {
+                "ts_ls",
+                "html",
+                "cssls",
+                "tailwindcss",
+                "svelte",
+                "lua_ls",
+                "graphql",
+                "emmet_ls",
+                "prismals",
+                "pyright",
+                "clangd",
+            },
+            automatic_enable = true,
+        })
     end,
 }
