@@ -8,12 +8,12 @@ return {
         "mason-org/mason.nvim",
         "mason-org/mason-lspconfig.nvim",
     },
-
     config = function()
         local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
         -- Short inline message; full message on hover (CursorHold opens float)
         local max_inline = 50
+
         vim.diagnostic.config({
             signs = {
                 text = {
@@ -42,19 +42,56 @@ return {
             underline = true,
             update_in_insert = false,
             severity_sort = true,
+            -- Optional: hide INFO/HINT in virtual text / floats if you want fewer messages
+            -- float = { severity = { min = vim.diagnostic.severity.WARN } },
+            -- virtual_text = { severity = { min = vim.diagnostic.severity.ERROR } },
         })
 
-        -- Show full diagnostic when cursor rests on a line with diagnostics
-        vim.opt.updatetime = 1000 -- CursorHold fires after this ms; keeps hover float responsive
+        -- === Improved diagnostic hover: auto-show + auto-close ===
+        vim.opt.updatetime = 1000 -- CursorHold fires after this ms
+
         local diag_group = vim.api.nvim_create_augroup("DiagnosticHover", { clear = true })
+        local last_diag_win = nil
+
+        -- Show diagnostic float when cursor rests
         vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
             group = diag_group,
             callback = function()
                 local bufnr = vim.api.nvim_get_current_buf()
                 local line = vim.api.nvim_win_get_cursor(0)[1] - 1
                 local diags = vim.diagnostic.get(bufnr, { lnum = line })
+
+                -- Close any previous diagnostic float first (prevents stacking)
+                if last_diag_win and vim.api.nvim_win_is_valid(last_diag_win) then
+                    vim.api.nvim_win_close(last_diag_win, true)
+                    last_diag_win = nil
+                end
+
                 if #diags > 0 then
-                    vim.diagnostic.open_float({ scope = "line", focus = false })
+                    local float_opts = {
+                        scope = "line",
+                        focus = false,
+                        border = "rounded",           -- optional: nicer look
+                        max_width = 80,               -- optional: prevent super wide floats
+                        header = "",                  -- optional: clean look
+                        prefix = "",
+                    }
+                    local res = vim.diagnostic.open_float(float_opts)
+                    -- open_float can return winid (number) or { winid = number } depending on Neovim version
+                    if res then
+                        last_diag_win = type(res) == "number" and res or res.winid
+                    end
+                end
+            end,
+        })
+
+        -- Close diagnostic float when cursor moves
+        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+            group = diag_group,
+            callback = function()
+                if last_diag_win and vim.api.nvim_win_is_valid(last_diag_win) then
+                    vim.api.nvim_win_close(last_diag_win, true)
+                    last_diag_win = nil
                 end
             end,
         })
@@ -67,6 +104,7 @@ return {
                 local map = function(keys, func, desc)
                     vim.keymap.set("n", keys, func, vim.tbl_extend("force", opts, { desc = desc }))
                 end
+
                 map("gR", "<cmd>Telescope lsp_references<CR>", "Show LSP references")
                 map("gD", vim.lsp.buf.declaration, "Go to declaration")
                 map("gd", "<cmd>Telescope lsp_definitions<CR>", "Show LSP definitions")
@@ -83,7 +121,7 @@ return {
             end,
         })
 
-        -- Default capabilities for all LSP servers (Neovim 0.11 vim.lsp.config API)
+        -- Default capabilities for all LSP servers
         vim.lsp.config("*", {
             capabilities = capabilities,
         })
@@ -101,7 +139,7 @@ return {
             },
         })
 
-        -- Per-server config: clangd (hover, go-to-def, etc. for C/C++)
+        -- Per-server config: clangd
         vim.lsp.config("clangd", {
             capabilities = capabilities,
             filetypes = { "c", "cpp", "objc", "objcpp" },
@@ -117,16 +155,18 @@ return {
             },
         })
 
-        -- Mason-LSPConfig v2: ensure installs; we enable servers explicitly (automatic_enable is unreliable on Neovim 0.11)
+        -- Mason-LSPConfig setup
         local servers = {
             "ts_ls", "html", "cssls", "tailwindcss", "svelte", "lua_ls",
             "graphql", "emmet_ls", "prismals", "pyright", "clangd",
         }
+
         require("mason-lspconfig").setup({
             ensure_installed = servers,
             automatic_enable = true,
         })
-        -- Explicitly enable each server so they attach to buffers (required for Neovim 0.11)
+
+        -- Explicitly enable each server (important for Neovim 0.11+)
         for _, name in ipairs(servers) do
             pcall(vim.lsp.enable, name)
         end
