@@ -16,35 +16,25 @@ return {
 
         vim.diagnostic.config({
             signs = {
+                severity = { min = vim.diagnostic.severity.WARN },
                 text = {
                     [vim.diagnostic.severity.ERROR] = " ",
                     [vim.diagnostic.severity.WARN] = " ",
-                    [vim.diagnostic.severity.HINT] = "󰠠 ",
-                    [vim.diagnostic.severity.INFO] = " ",
                 },
-                texthl = {
-                    [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
-                    [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
-                    [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
-                    [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
-                },
+            },
+            underline = {
+                severity = { min = vim.diagnostic.severity.WARN },
             },
             virtual_text = {
-                virt_text_pos = "eol_right_align", -- push message to the right edge of the window
+                severity = { min = vim.diagnostic.severity.WARN },
+                virt_text_pos = "eol_right_align",
                 format = function(diag)
                     local msg = diag.message:gsub("\n", " "):gsub("%s+", " ")
-                    if #msg > max_inline then
-                        return msg:sub(1, max_inline) .. "…"
-                    end
-                    return msg
+                    return (#msg > 50) and (msg:sub(1, 50) .. "…") or msg
                 end,
             },
-            underline = true,
             update_in_insert = false,
             severity_sort = true,
-            -- Optional: hide INFO/HINT in virtual text / floats if you want fewer messages
-            -- float = { severity = { min = vim.diagnostic.severity.WARN } },
-            -- virtual_text = { severity = { min = vim.diagnostic.severity.ERROR } },
         })
 
         -- === Improved diagnostic hover: auto-show + auto-close ===
@@ -71,9 +61,9 @@ return {
                     local float_opts = {
                         scope = "line",
                         focus = false,
-                        border = "rounded",           -- optional: nicer look
-                        max_width = 80,               -- optional: prevent super wide floats
-                        header = "",                  -- optional: clean look
+                        border = "rounded", -- optional: nicer look
+                        max_width = 100, -- optional: prevent super wide floats
+                        header = "", -- optional: clean look
                         prefix = "",
                     }
                     local res = vim.diagnostic.open_float(float_opts)
@@ -157,8 +147,17 @@ return {
 
         -- Mason-LSPConfig setup
         local servers = {
-            "ts_ls", "html", "cssls", "tailwindcss", "svelte", "lua_ls",
-            "graphql", "emmet_ls", "prismals", "pyright", "clangd",
+            "ts_ls",
+            "html",
+            "cssls",
+            "tailwindcss",
+            "svelte",
+            "lua_ls",
+            "graphql",
+            "emmet_ls",
+            "prismals",
+            "pyright",
+            "clangd",
         }
 
         require("mason-lspconfig").setup({

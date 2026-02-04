@@ -8,7 +8,7 @@ return {
         lint.linters.pylint = lint.linters.pylint or {}
         local pylint_args = lint.linters.pylint.args or {}
         lint.linters.pylint.args = vim.list_extend(pylint_args, {
-            "--disable=missing-module-docstring,missing-function-docstring",
+            "--disable=missing-module-docstring,missing-function-docstring,broad-exception-raised",
         })
 
         -- Disable cpplint "No copyright message" (legal/copyright)
