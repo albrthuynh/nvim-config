@@ -32,8 +32,3 @@ This is my personal Neovim configuration — optimized for development with mode
 
 ---
 
-## 📦 License
-
-[MIT](./LICENSE)
-
----
