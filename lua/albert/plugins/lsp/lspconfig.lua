@@ -145,6 +145,14 @@ return {
             },
         })
 
+        -- Disable diagnostics for C files (xv6 sanity)
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = "c",
+            callback = function()
+                vim.diagnostic.disable(0)
+            end,
+        })
+
         -- Mason-LSPConfig setup
         local servers = {
             "ts_ls",
