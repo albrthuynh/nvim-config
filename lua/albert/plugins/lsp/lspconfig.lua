@@ -153,7 +153,7 @@ return {
             end,
         })
 
-        -- Mason-LSPConfig setup
+        -- Mason-LSPConfig setup (clangd omitted: use system install, e.g. apt install clangd)
         local servers = {
             "ts_ls",
             "html",
@@ -165,7 +165,6 @@ return {
             "emmet_ls",
             "prismals",
             "pyright",
-            "clangd",
         }
 
         require("mason-lspconfig").setup({
@@ -177,5 +176,6 @@ return {
         for _, name in ipairs(servers) do
             pcall(vim.lsp.enable, name)
         end
+        pcall(vim.lsp.enable, "clangd") -- use system clangd (apt install clangd)
     end,
 }
