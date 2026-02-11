@@ -29,17 +29,9 @@ return {
             cpp = { "cpplint" },
         }
 
-        local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-
-        vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-            group = lint_augroup,
-            callback = function()
-                lint.try_lint()
-            end,
-        })
-
+        -- Lint only on demand (<leader>l). By default only LSP diagnostics show (VS Code–like).
         vim.keymap.set("n", "<leader>l", function()
             lint.try_lint()
-        end, { desc = "Trigger linting for current file" })
+        end, { desc = "Run linter for current file" })
     end,
 }

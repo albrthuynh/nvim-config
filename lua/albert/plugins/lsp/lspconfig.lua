@@ -11,9 +11,41 @@ return {
     config = function()
         local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-        -- Short inline message; full message on hover (CursorHold opens float)
-        local max_inline = 50
+        -- Filter out whitespace/formatting noise; keep real warnings and errors
+        local whitespace_patterns = {
+            "trailing%s+whitespace",
+            "trailing whitespace",
+            "delete%s+cr",
+            "expected%s+newline",
+            "missing%s+final%s+newline",
+            "missing newline",
+            "extra newline",
+            "mixed%s+indent",
+            "inconsistent indent",
+            "line too long",
+            "line length",
+            "whitespace",
+        }
+        local function is_whitespace_diag(msg)
+            if not msg or msg == "" then return true end
+            local lower = msg:lower()
+            for _, pat in ipairs(whitespace_patterns) do
+                if lower:match(pat) then return true end
+            end
+            return false
+        end
 
+        local orig_publish = vim.lsp.handlers["textDocument/publishDiagnostics"]
+        vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+            if result and result.diagnostics and #result.diagnostics > 0 then
+                result.diagnostics = vim.tbl_filter(function(d)
+                    return not is_whitespace_diag(d.message)
+                end, result.diagnostics)
+            end
+            orig_publish(err, result, ctx, config)
+        end
+
+        -- VS Code–like: only LSP errors + warnings (no lint unless <leader>l), no virtual text
         vim.diagnostic.config({
             signs = {
                 severity = { min = vim.diagnostic.severity.WARN },
@@ -25,14 +57,7 @@ return {
             underline = {
                 severity = { min = vim.diagnostic.severity.WARN },
             },
-            virtual_text = {
-                severity = { min = vim.diagnostic.severity.WARN },
-                virt_text_pos = "eol_right_align",
-                format = function(diag)
-                    local msg = diag.message:gsub("\n", " "):gsub("%s+", " ")
-                    return (#msg > 50) and (msg:sub(1, 50) .. "…") or msg
-                end,
-            },
+            virtual_text = false,
             update_in_insert = false,
             severity_sort = true,
         })
