@@ -11,22 +11,40 @@ return {
     config = function()
         local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-        -- Short inline message; full message on hover (CursorHold opens float)
+        -- Drop clangd's "Too many errors emitted, stopping now" meta-diagnostic so it
+        -- never appears in the UI (it's not a real source error).
+        local orig_diag_set = vim.diagnostic.set
+        vim.diagnostic.set = function(namespace, bufnr, diagnostics, opts)
+            local list = diagnostics
+            if list and #list > 0 then
+                list = vim.tbl_filter(function(d)
+                    local code = d.code
+                    if code == "fatal_too_many_errors" then return false end
+                    if type(code) == "string" and code:find("fatal_too_many_errors") then return false end
+                    if d.message and d.message:find("fatal_too_many_errors") then return false end
+                    return true
+                end, list)
+            end
+            return orig_diag_set(namespace, bufnr, list, opts)
+        end
+
+        -- Only show errors in the UI (like VS Code default): hide warnings/hints from
+        -- style linters (e.g. clang-tidy) so we only see core issues (missing includes,
+        -- undeclared identifiers, type errors).
         local max_inline = 50
 
         vim.diagnostic.config({
             signs = {
-                severity = { min = vim.diagnostic.severity.WARN },
+                severity = { min = vim.diagnostic.severity.ERROR },
                 text = {
                     [vim.diagnostic.severity.ERROR] = " ",
-                    [vim.diagnostic.severity.WARN] = " ",
                 },
             },
             underline = {
-                severity = { min = vim.diagnostic.severity.WARN },
+                severity = { min = vim.diagnostic.severity.ERROR },
             },
             virtual_text = {
-                severity = { min = vim.diagnostic.severity.WARN },
+                severity = { min = vim.diagnostic.severity.ERROR },
                 virt_text_pos = "eol_right_align",
                 format = function(diag)
                     local msg = diag.message:gsub("\n", " "):gsub("%s+", " ")
@@ -129,19 +147,19 @@ return {
             },
         })
 
-        -- Per-server config: clangd
+        -- Per-server config: clangd (no --clang-tidy so we only get compiler/semantic
+        -- diagnostics: missing includes, undeclared ids, type errors; no style/lint noise)
         vim.lsp.config("clangd", {
             capabilities = capabilities,
             filetypes = { "c", "cpp", "objc", "objcpp" },
             cmd = {
                 "clangd",
                 "--background-index",
-                "--clang-tidy",
                 "--header-insertion=iwyu",
                 "--completion-style=detailed",
             },
             init_options = {
-                fallbackFlags = { "--std=c++23" },
+                fallbackFlags = { "--std=c++23", "-ferror-limit=0" },
             },
         })
 

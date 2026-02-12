@@ -19,13 +19,15 @@ return {
                 graphql = { "prettier" },
                 liquid = { "prettier" },
                 lua = { "stylua" },
-                python = { "isort", "black" },
+                -- Use <leader>mp to format manually if needed.
+                python = {},
             },
-            format_on_save = {
-                lsp_fallback = true,
-                async = false,
-                timeout_ms = 1000,
-            },
+            format_on_save = function(bufnr)
+                if vim.bo[bufnr].filetype == "python" then
+                    return
+                end
+                return { lsp_fallback = true, async = false, timeout_ms = 1000 }
+            end,
         })
 
         vim.keymap.set({ "n", "v" }, "<leader>mp", function()
