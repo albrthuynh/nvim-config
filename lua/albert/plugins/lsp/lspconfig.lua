@@ -27,10 +27,14 @@ return {
             "whitespace",
         }
         local function is_whitespace_diag(msg)
-            if not msg or msg == "" then return true end
+            if not msg or msg == "" then
+                return true
+            end
             local lower = msg:lower()
             for _, pat in ipairs(whitespace_patterns) do
-                if lower:match(pat) then return true end
+                if lower:match(pat) then
+                    return true
+                end
             end
             return false
         end
@@ -167,6 +171,16 @@ return {
             },
             init_options = {
                 fallbackFlags = { "--std=c++23" },
+            },
+        })
+
+        -- Per-server config: cssls (ignore unknown at-rules like @theme, @tailwind, @apply)
+        vim.lsp.config("cssls", {
+            capabilities = capabilities,
+            settings = {
+                css = { lint = { unknownAtRules = "ignore" } },
+                scss = { lint = { unknownAtRules = "ignore" } },
+                less = { lint = { unknownAtRules = "ignore" } },
             },
         })
 
