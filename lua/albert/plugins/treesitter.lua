@@ -12,10 +12,28 @@ return {
 
         -- Install parsers (runs async in background)
         require("nvim-treesitter").install({
-            "json", "javascript", "typescript", "tsx", "yaml", "html", "css",
-            "prisma", "markdown", "markdown_inline", "svelte", "graphql",
-            "bash", "lua", "vim", "dockerfile", "gitignore", "query",
-            "vimdoc", "c", "cpp", "java",
+            "json",
+            "javascript",
+            "typescript",
+            "tsx",
+            "yaml",
+            "html",
+            "css",
+            "prisma",
+            "markdown",
+            "markdown_inline",
+            "svelte",
+            "graphql",
+            "bash",
+            "lua",
+            "vim",
+            "dockerfile",
+            "gitignore",
+            "query",
+            "vimdoc",
+            "c",
+            "cpp",
+            "java",
         })
 
         -- Treesitter highlighting (nvim-treesitter 1.0 way)
@@ -27,10 +45,13 @@ return {
             end,
         })
 
-        -- Treesitter-based indentation
+        -- Treesitter-based indentation (Lua excluded - TS indent is broken for Lua)
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "*",
             callback = function()
+                if vim.bo.filetype == "lua" then
+                    return
+                end
                 pcall(function()
                     vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
                 end)
