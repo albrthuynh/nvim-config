@@ -26,15 +26,16 @@ return {
                 if vim.bo[bufnr].filetype == "python" then
                     return
                 end
-                return { lsp_fallback = true, async = false, timeout_ms = 1000 }
+                -- Only use Conform formatters above; no LSP fallback (avoids aggressive LSP formatters).
+                return { lsp_fallback = false, async = false, timeout_ms = 2000 }
             end,
         })
 
         vim.keymap.set({ "n", "v" }, "<leader>mp", function()
             conform.format({
-                lsp_fallback = true,
+                lsp_fallback = true, -- manual format can use LSP if you want
                 async = false,
-                timeout_ms = 1000,
+                timeout_ms = 2000,
             })
         end, { desc = "Format file or range (in visual mode)" })
     end,
