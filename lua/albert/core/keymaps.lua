@@ -44,6 +44,9 @@ if vim.g.vscode then
         vscode.action("search.action.clearSearchResults")
     end, { desc = "Clear search highlights" })
 
+    -- Go to the definition
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+
     -- Window/split management
     keymap.set("n", "<leader>sv", function()
         vscode.action("workbench.action.splitEditor")
