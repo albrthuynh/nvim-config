@@ -1,36 +1,53 @@
 return {
-  "goolord/alpha-nvim",
-  event = "VimEnter",
-  config = function()
-    local alpha = require("alpha")
-    local dashboard = require("alpha.themes.dashboard")
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    config = function()
+        local alpha = require("alpha")
+        local dashboard = require("alpha.themes.dashboard")
 
-    -- Set header
-    dashboard.section.header.val = {
-      "                                                     ",
-      "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
-      "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
-      "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
-      "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
-      "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
-      "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
-      "                                                     ",
-    }
+        -- Header
+        dashboard.section.header.val = {
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+            "     █████╗ ██╗     ██████╗ ███████╗██████╗ ████████╗ ",
+            "    ██╔══██╗██║     ██╔══██╗██╔════╝██╔══██╗╚══██╔══╝ ",
+            "    ███████║██║     ██████╔╝█████╗  ██████╔╝   ██║    ",
+            "    ██╔══██║██║     ██╔══██╗██╔══╝  ██╔══██╗   ██║    ",
+            "    ██║  ██║███████╗██████╔╝███████╗██║  ██║   ██║    ",
+            "    ╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝    ",
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+            "          systems • backend • build fast       ",
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+        }
 
-    -- Set menu
-    dashboard.section.buttons.val = {
-      dashboard.button("e", "  > New File", "<cmd>ene<CR>"),
-      dashboard.button("SPC ee", "  > Toggle file explorer", "<cmd>NvimTreeToggle<CR>"),
-      dashboard.button("SPC ff", "󰱼 > Find File", "<cmd>Telescope find_files<CR>"),
-      dashboard.button("SPC fs", "  > Find Word", "<cmd>Telescope live_grep<CR>"),
-      dashboard.button("SPC wr", "󰁯  > Restore Session For Current Directory", "<cmd>SessionRestore<CR>"),
-      dashboard.button("q", " > Quit NVIM", "<cmd>qa<CR>"),
-    }
+        -- Buttons
+        dashboard.section.buttons.val = {
+            dashboard.button("e", "  New file", "<cmd>ene<CR>"),
+            dashboard.button("f", "󰱼  Find file", "<cmd>Telescope find_files<CR>"),
+            dashboard.button("g", "  Live grep", "<cmd>Telescope live_grep<CR>"),
+            dashboard.button("r", "󰁯  Restore session", "<cmd>SessionRestore<CR>"),
+            dashboard.button("c", "  Config", "<cmd>edit ~/.config/nvim/init.lua<CR>"),
+            dashboard.button("q", "  Quit", "<cmd>qa<CR>"),
+        }
 
-    -- Send config to alpha
-    alpha.setup(dashboard.opts)
+        -- Footer
+        dashboard.section.footer.val = {
+            "",
+            "“Ship it. Fix it. Make it clean.”",
+        }
 
-    -- Disable folding on alpha buffer
-    vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
-  end,
+        -- Layout spacing
+        dashboard.config.layout = {
+            { type = "padding", val = 2 },
+            dashboard.section.header,
+            { type = "padding", val = 2 },
+            dashboard.section.buttons,
+            { type = "padding", val = 2 },
+            dashboard.section.footer,
+        }
+
+        alpha.setup(dashboard.config)
+
+        -- Disable folding
+        vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
+    end,
 }
