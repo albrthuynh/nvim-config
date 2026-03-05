@@ -167,7 +167,7 @@ return {
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "c",
             callback = function()
-                vim.diagnostic.disable(0)
+                vim.diagnostic.enable(false, { bufnr = 0 })
             end,
         })
 

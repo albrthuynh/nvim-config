@@ -4,7 +4,16 @@ return {
     config = function()
         local conform = require("conform")
 
+        -- Prefer Mason's stylua when installed; otherwise use PATH (e.g. cargo install stylua)
+        local mason_stylua = vim.fn.stdpath("data") .. "/mason/bin/stylua"
+        local stylua_cmd = (vim.fn.executable(mason_stylua) == 1) and mason_stylua or "stylua"
+
         conform.setup({
+            formatters = {
+                stylua = {
+                    command = stylua_cmd,
+                },
+            },
             formatters_by_ft = {
                 javascript = { "prettier" },
                 typescript = { "prettier" },
@@ -19,23 +28,26 @@ return {
                 graphql = { "prettier" },
                 liquid = { "prettier" },
                 lua = { "stylua" },
-                -- Use <leader>mp to format manually if needed.
-                python = {},
+                python = { "isort", "black" },
             },
             format_on_save = function(bufnr)
-                if vim.bo[bufnr].filetype == "python" then
-                    return
+                local ft = vim.bo[bufnr].filetype
+                if ft == "c" then
+                    return nil -- no format on save for C/C++
                 end
-                -- Only use Conform formatters above; no LSP fallback (avoids aggressive LSP formatters).
-                return { lsp_fallback = false, async = false, timeout_ms = 2000 }
+                return {
+                    lsp_fallback = true,
+                    async = false,
+                    timeout_ms = 1000,
+                }
             end,
         })
 
         vim.keymap.set({ "n", "v" }, "<leader>mp", function()
             conform.format({
-                lsp_fallback = true, -- manual format can use LSP if you want
+                lsp_fallback = true,
                 async = false,
-                timeout_ms = 2000,
+                timeout_ms = 1000,
             })
         end, { desc = "Format file or range (in visual mode)" })
     end,
