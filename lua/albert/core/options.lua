@@ -11,6 +11,15 @@ opt.shiftwidth = 2
 opt.expandtab = true
 opt.autoindent = true
 
+-- Use Vim's C indenter for C-family files as a stable fallback.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "c", "cpp" },
+  callback = function()
+    vim.opt_local.cindent = true
+    vim.opt_local.autoindent = true
+  end,
+})
+
 opt.wrap = false
 
 -- search settings

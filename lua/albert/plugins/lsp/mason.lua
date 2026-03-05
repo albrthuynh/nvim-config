@@ -18,7 +18,6 @@ return {
         })
 
         -- mason-lspconfig is configured in lspconfig.lua (ensure_installed, automatic_enable)
-
         require("mason-tool-installer").setup({
             ensure_installed = {
                 "prettier",

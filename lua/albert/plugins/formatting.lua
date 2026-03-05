@@ -30,11 +30,17 @@ return {
                 lua = { "stylua" },
                 python = { "isort", "black" },
             },
-            format_on_save = {
-                lsp_fallback = true,
-                async = false,
-                timeout_ms = 1000,
-            },
+            format_on_save = function(bufnr)
+                local ft = vim.bo[bufnr].filetype
+                if ft == "c" then 
+                    return nil -- no format on save for C/C++
+                end
+                return {
+                    lsp_fallback = true,
+                    async = false,
+                    timeout_ms = 1000,
+                }
+            end,
         })
 
         vim.keymap.set({ "n", "v" }, "<leader>mp", function()

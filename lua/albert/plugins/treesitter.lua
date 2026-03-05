@@ -2,15 +2,13 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = false,
     build = ":TSUpdate",
-    dependencies = {
-        "windwp/nvim-ts-autotag",
-    },
+    dependencies = { "windwp/nvim-ts-autotag" },
     config = function()
+        -- New main-branch API: no "configs" module, only setup + install
         require("nvim-treesitter").setup({
             install_dir = vim.fn.stdpath("data") .. "/site",
         })
 
-        -- Install parsers (runs async in background)
         require("nvim-treesitter").install({
             "json",
             "javascript",
@@ -36,8 +34,7 @@ return {
             "java",
         })
 
-        -- Treesitter highlighting (nvim-treesitter 1.0 way)
-        -- Skip filetypes without parsers (e.g. alpha, netrw) to avoid errors
+        -- Start treesitter for buffers (skip if no parser to avoid errors)
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "*",
             callback = function()
@@ -45,11 +42,13 @@ return {
             end,
         })
 
-        -- Treesitter-based indentation (Lua excluded - TS indent is broken for Lua)
+        -- Treesitter indent is experimental; use built-in indent for C/C++/Lua
+        -- (C/C++ also get cindent from options.lua for comment/newline behavior)
+        local indent_skip_ft = { lua = true, c = true, cpp = true }
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "*",
             callback = function()
-                if vim.bo.filetype == "lua" then
+                if indent_skip_ft[vim.bo.filetype] then
                     return
                 end
                 pcall(function()
