@@ -9,6 +9,17 @@ return {
         "mason-org/mason-lspconfig.nvim",
     },
     config = function()
+        -- Silence Neovim 0.10+ LSP warning when plugins (e.g. Telescope lsp_definitions)
+        -- call make_position_params() without position_encoding. Behavior is unchanged
+        -- (Neovim uses first client's encoding); the message is noisy on gd/gt/gr.
+        local notify_orig = vim.notify
+        vim.notify = function(msg, level, opts)
+            if type(msg) == "string" and msg:match("position_encoding param is required") then
+                return
+            end
+            return notify_orig(msg, level, opts)
+        end
+
         local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
         -- Filter out whitespace/formatting noise; keep real warnings and errors
