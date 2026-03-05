@@ -113,11 +113,11 @@ return {
                     vim.keymap.set("n", keys, func, vim.tbl_extend("force", opts, { desc = desc }))
                 end
 
-                map("gR", "<cmd>Telescope lsp_references<CR>", "Show LSP references")
+                map("gR", vim.lsp.buf.references, "Show LSP references")
                 map("gD", vim.lsp.buf.declaration, "Go to declaration")
-                map("gd", "<cmd>Telescope lsp_definitions<CR>", "Show LSP definitions")
-                map("gi", "<cmd>Telescope lsp_implementations<CR>", "Show implementations")
-                map("gt", "<cmd>Telescope lsp_type_definitions<CR>", "Show type definitions")
+                map("gd", vim.lsp.buf.definition, "Show LSP definitions")
+                map("gi", vim.lsp.buf.implementation, "Show implementations")
+                map("gt", vim.lsp.buf.type_definition, "Show type definitions")
                 map("<leader>ca", vim.lsp.buf.code_action, "Code actions (n/v)")
                 map("<leader>rn", vim.lsp.buf.rename, "Smart rename")
                 map("<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", "Buffer diagnostics")
