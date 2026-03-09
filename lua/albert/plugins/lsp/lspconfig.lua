@@ -9,70 +9,54 @@ return {
         "mason-org/mason-lspconfig.nvim",
     },
     config = function()
-        -- Silence Neovim 0.10+ LSP warning when plugins (e.g. Telescope lsp_definitions)
-        -- call make_position_params() without position_encoding. Behavior is unchanged
-        -- (Neovim uses first client's encoding); the message is noisy on gd/gt/gr.
-        local notify_orig = vim.notify
-        vim.notify = function(msg, level, opts)
-            if type(msg) == "string" and msg:match("position_encoding param is required") then
-                return
-            end
-            return notify_orig(msg, level, opts)
-        end
-
         local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-        -- Filter out whitespace/formatting noise; keep real warnings and errors
-        local whitespace_patterns = {
-            "trailing%s+whitespace",
-            "trailing whitespace",
-            "delete%s+cr",
-            "expected%s+newline",
-            "missing%s+final%s+newline",
-            "missing newline",
-            "extra newline",
-            "mixed%s+indent",
-            "inconsistent indent",
-            "line too long",
-            "line length",
-            "whitespace",
-        }
-        local function is_whitespace_diag(msg)
-            if not msg or msg == "" then
-                return true
-            end
-            local lower = msg:lower()
-            for _, pat in ipairs(whitespace_patterns) do
-                if lower:match(pat) then
+        -- Drop clangd's "Too many errors emitted, stopping now" meta-diagnostic so it
+        -- never appears in the UI (it's not a real source error).
+        local orig_diag_set = vim.diagnostic.set
+        vim.diagnostic.set = function(namespace, bufnr, diagnostics, opts)
+            local list = diagnostics
+            if list and #list > 0 then
+                list = vim.tbl_filter(function(d)
+                    local code = d.code
+                    if code == "fatal_too_many_errors" then
+                        return false
+                    end
+                    if type(code) == "string" and code:find("fatal_too_many_errors") then
+                        return false
+                    end
+                    if d.message and d.message:find("fatal_too_many_errors") then
+                        return false
+                    end
                     return true
-                end
+                end, list)
             end
-            return false
+            return orig_diag_set(namespace, bufnr, list, opts)
         end
 
-        local orig_publish = vim.lsp.handlers["textDocument/publishDiagnostics"]
-        vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
-            if result and result.diagnostics and #result.diagnostics > 0 then
-                result.diagnostics = vim.tbl_filter(function(d)
-                    return not is_whitespace_diag(d.message)
-                end, result.diagnostics)
-            end
-            orig_publish(err, result, ctx, config)
-        end
+        -- Only show errors in the UI (like VS Code default): hide warnings/hints from
+        -- style linters (e.g. clang-tidy) so we only see core issues (missing includes,
+        -- undeclared identifiers, type errors).
+        local max_inline = 50
 
-        -- VS Code–like: only LSP errors + warnings (no lint unless <leader>l), no virtual text
         vim.diagnostic.config({
             signs = {
-                severity = { min = vim.diagnostic.severity.WARN },
+                severity = { min = vim.diagnostic.severity.ERROR },
                 text = {
                     [vim.diagnostic.severity.ERROR] = " ",
-                    [vim.diagnostic.severity.WARN] = " ",
                 },
             },
             underline = {
-                severity = { min = vim.diagnostic.severity.WARN },
+                severity = { min = vim.diagnostic.severity.ERROR },
             },
-            virtual_text = false,
+            virtual_text = {
+                severity = { min = vim.diagnostic.severity.ERROR },
+                virt_text_pos = "eol_right_align",
+                format = function(diag)
+                    local msg = diag.message:gsub("\n", " "):gsub("%s+", " ")
+                    return (#msg > 50) and (msg:sub(1, 50) .. "…") or msg
+                end,
+            },
             update_in_insert = false,
             severity_sort = true,
         })
@@ -135,11 +119,11 @@ return {
                     vim.keymap.set("n", keys, func, vim.tbl_extend("force", opts, { desc = desc }))
                 end
 
-                map("gR", "<cmd>Telescope lsp_references<CR>", "Show LSP references")
+                map("gR", vim.lsp.buf.references, "Show LSP references")
                 map("gD", vim.lsp.buf.declaration, "Go to declaration")
-                map("gd", "<cmd>Telescope lsp_definitions<CR>", "Show LSP definitions")
-                map("gi", "<cmd>Telescope lsp_implementations<CR>", "Show implementations")
-                map("gt", "<cmd>Telescope lsp_type_definitions<CR>", "Show type definitions")
+                map("gd", vim.lsp.buf.definition, "Show LSP definitions")
+                map("gi", vim.lsp.buf.implementation, "Show implementations")
+                map("gt", vim.lsp.buf.type_definition, "Show type definitions")
                 map("<leader>ca", vim.lsp.buf.code_action, "Code actions (n/v)")
                 map("<leader>rn", vim.lsp.buf.rename, "Smart rename")
                 map("<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", "Buffer diagnostics")
@@ -169,29 +153,19 @@ return {
             },
         })
 
-        -- Per-server config: clangd
+        -- Per-server config: clangd (no --clang-tidy so we only get compiler/semantic
+        -- diagnostics: missing includes, undeclared ids, type errors; no style/lint noise)
         vim.lsp.config("clangd", {
             capabilities = capabilities,
             filetypes = { "c", "cpp", "objc", "objcpp" },
             cmd = {
                 "clangd",
                 "--background-index",
-                "--clang-tidy",
                 "--header-insertion=iwyu",
                 "--completion-style=detailed",
             },
             init_options = {
-                fallbackFlags = { "--std=c++23" },
-            },
-        })
-
-        -- Per-server config: cssls (ignore unknown at-rules like @theme, @tailwind, @apply)
-        vim.lsp.config("cssls", {
-            capabilities = capabilities,
-            settings = {
-                css = { lint = { unknownAtRules = "ignore" } },
-                scss = { lint = { unknownAtRules = "ignore" } },
-                less = { lint = { unknownAtRules = "ignore" } },
+                fallbackFlags = { "--std=c++23", "-ferror-limit=0" },
             },
         })
 
@@ -199,11 +173,11 @@ return {
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "c",
             callback = function()
-                vim.diagnostic.disable(0)
+                vim.diagnostic.enable(false, { bufnr = 0 })
             end,
         })
 
-        -- Mason-LSPConfig setup (clangd omitted: use system install, e.g. apt install clangd)
+        -- Mason-LSPConfig setup
         local servers = {
             "ts_ls",
             "html",
@@ -215,6 +189,7 @@ return {
             "emmet_ls",
             "prismals",
             "pyright",
+            "clangd",
         }
 
         require("mason-lspconfig").setup({
@@ -226,6 +201,5 @@ return {
         for _, name in ipairs(servers) do
             pcall(vim.lsp.enable, name)
         end
-        pcall(vim.lsp.enable, "clangd") -- use system clangd (apt install clangd)
     end,
 }
