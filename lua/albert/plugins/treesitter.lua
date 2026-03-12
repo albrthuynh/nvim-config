@@ -4,35 +4,10 @@ return {
     build = ":TSUpdate",
     dependencies = { "windwp/nvim-ts-autotag" },
     config = function()
-        -- New main-branch API: no "configs" module, only setup + install
         require("nvim-treesitter").setup({
             install_dir = vim.fn.stdpath("data") .. "/site",
         })
-
-        require("nvim-treesitter").install({
-            "json",
-            "javascript",
-            "typescript",
-            "tsx",
-            "yaml",
-            "html",
-            "css",
-            "prisma",
-            "markdown",
-            "markdown_inline",
-            "svelte",
-            "graphql",
-            "bash",
-            "lua",
-            "vim",
-            "dockerfile",
-            "gitignore",
-            "query",
-            "vimdoc",
-            "c",
-            "cpp",
-            "java",
-        })
+        -- Use :TSInstall / :TSUpdate when you actually want to change parsers.
 
         -- Start treesitter for buffers (skip if no parser to avoid errors)
         vim.api.nvim_create_autocmd("FileType", {
