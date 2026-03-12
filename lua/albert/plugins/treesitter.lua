@@ -42,9 +42,19 @@ return {
             end,
         })
 
-        -- Treesitter indent is experimental; use built-in indent for C/C++/Lua
+        -- Treesitter indent is experimental; use built-in indent for these filetypes.
         -- (C/C++ also get cindent from options.lua for comment/newline behavior)
-        local indent_skip_ft = { lua = true, c = true, cpp = true }
+        local indent_skip_ft = {
+            lua = true,
+            c = true,
+            cpp = true,
+            typescript = true,
+            tsx = true,
+            javascript = true,
+            javascriptreact = true,
+            typescriptreact = true,
+            yaml = true,
+        }
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "*",
             callback = function()
