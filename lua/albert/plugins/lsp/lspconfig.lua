@@ -152,6 +152,7 @@ return {
         vim.lsp.config("clangd", {
             capabilities = capabilities,
             filetypes = { "c", "cpp", "objc", "objcpp" },
+            root_markers = { "compile_commands.json", "compile_flags.txt", ".git" },
             cmd = {
                 "clangd",
                 "--background-index",
@@ -159,8 +160,31 @@ return {
                 "--completion-style=detailed",
             },
             init_options = {
-                fallbackFlags = { "--std=c++23", "-ferror-limit=0" },
+                fallbackFlags = { "-ferror-limit=0" },
             },
+        })
+
+        -- Per-server config: pyright (prefer project roots; reduce noise outside project context)
+        vim.lsp.config("pyright", {
+            capabilities = capabilities,
+            root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
+            settings = {
+                python = {
+                    analysis = {
+                        autoSearchPaths = true,
+                        useLibraryCodeForTypes = true,
+                        diagnosticMode = "openFilesOnly",
+                        typeCheckingMode = "basic",
+                    },
+                },
+            },
+        })
+
+        -- Per-server config: ts_ls (attach to real TS/JS projects only)
+        vim.lsp.config("ts_ls", {
+            capabilities = capabilities,
+            root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
+            single_file_support = false,
         })
 
         -- Disable diagnostics for C files (xv6 sanity)
