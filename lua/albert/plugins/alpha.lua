@@ -24,7 +24,7 @@ return {
       dashboard.button("e", "  New file", "<cmd>ene<CR>"),
       dashboard.button("f", "󰱼  Find file", "<cmd>Telescope find_files<CR>"),
       dashboard.button("g", "  Live grep", "<cmd>Telescope live_grep<CR>"),
-      dashboard.button("r", "󰁯  Restore session", "<cmd>SessionRestore<CR>"),
+      dashboard.button("r", "󰁯  Restore session", "<cmd>AutoSession restore<CR>"),
       dashboard.button("c", "  Config", "<cmd>edit ~/.config/nvim/init.lua<CR>"),
       dashboard.button("q", "  Quit", "<cmd>qa<CR>"),
     }
