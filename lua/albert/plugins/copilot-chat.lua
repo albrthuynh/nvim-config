@@ -15,7 +15,7 @@ return {
         require("CopilotChat").setup({
             -- Default config is good for most people
             -- Optional customizations below
-            model = "claude-sonnet-4", -- or gpt-4o, o1-mini, claude-3-opus, etc. (Copilot-supported models)
+            model = "gpt-5.1", -- or gpt-4o, o1-mini, claude-3-opus, etc. (Copilot-supported models)
             auto_follow_cursor = false, -- Don't auto-scroll chat to cursor
             show_help = true, -- Show keybinding hints
             auto_insert_mode = true, -- Enter insert mode when opening chat
@@ -25,7 +25,7 @@ return {
                 width = 0.4, -- fraction of screen width
                 height = 0.6,
             },
-            -- mappings = { ... }        -- customize keymaps if needed
+            -- mappings = { ... }
         })
 
         -- Optional: quick keymaps

@@ -7,6 +7,7 @@ return {
         "stevearc/dressing.nvim",
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
+        "lukas-reineke/headlines.nvim",
         "nvim-tree/nvim-web-devicons", -- or mini.icons
         "zbirenbaum/copilot.lua", -- ← depends on this!
     },

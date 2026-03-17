@@ -1,5 +1,4 @@
 vim.g.mapleader = " "
-vim.g.tmux_navigator_no_mappings = 1
 
 local keymap = vim.keymap
 
@@ -7,27 +6,23 @@ keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
--- Move to last non-blank character instead of the absolute end of line
-keymap.set({ "n", "v" }, "$", "g_", { desc = "Go to last non-blank character" })
-
 -- increment/decrement numbers
 keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" })
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" })
-
--- delete without copying
-vim.keymap.set({ "n", "v" }, "<leader>d", '"_d', { noremap = true })
 
 -- window management
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
 keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
 keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" })
 keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" })
-keymap.set("n", "<leader>wh", "<C-w>h", { desc = "Focus left split" })
-keymap.set("n", "<leader>wj", "<C-w>j", { desc = "Focus lower split" })
-keymap.set("n", "<leader>wk", "<C-w>k", { desc = "Focus upper split" })
-keymap.set("n", "<leader>wl", "<C-w>l", { desc = "Focus right split" })
 
 keymap.set("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
+
+-- switch pane focus
+keymap.set("n", "<leader>wh", "<C-w>h", { desc = "Focus left pane" })
+keymap.set("n", "<leader>wj", "<C-w>j", { desc = "Focus below pane" })
+keymap.set("n", "<leader>wk", "<C-w>k", { desc = "Focus above pane" })
+keymap.set("n", "<leader>wl", "<C-w>l", { desc = "Focus right pane" })
 keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" })
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" })
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
