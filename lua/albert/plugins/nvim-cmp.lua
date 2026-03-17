@@ -41,7 +41,15 @@ return {
                 ["<C-f>"] = cmp.mapping.scroll_docs(4),
                 ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
                 ["<C-e>"] = cmp.mapping.abort(), -- close completion window
-                ["<CR>"] = cmp.mapping.confirm({ select = false }),
+                ["<CR>"] = cmp.mapping(function(fallback)
+                    -- Only confirm when a completion menu is visible and an item is selected.
+                    -- Otherwise, fall back to Neovim's default <CR> behavior (which preserves indent).
+                    if cmp.visible() and cmp.get_selected_entry() then
+                        cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" }),
 
                 -- Adding autocompletion with tab
                 ["<Tab>"] = cmp.mapping(function(fallback)

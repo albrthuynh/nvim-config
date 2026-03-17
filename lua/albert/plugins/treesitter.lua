@@ -21,6 +21,7 @@ return {
         -- (C/C++ also get cindent from options.lua for comment/newline behavior)
         local indent_skip_ft = {
             lua = true,
+            python = true,
             c = true,
             cpp = true,
             typescript = true,

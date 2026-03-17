@@ -1,4 +1,5 @@
 vim.cmd("let g:netrw_liststyle = 3")
+vim.cmd("filetype plugin indent on")
 
 local opt = vim.opt
 
