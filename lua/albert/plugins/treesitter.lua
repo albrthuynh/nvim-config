@@ -14,8 +14,11 @@ return {
             highlight = {
                 enable = true,
             },
-            -- enable indentation
-            indent = { enable = true },
+            -- use runtime Lua indentation to avoid TS indent quirks on <CR>
+            indent = {
+                enable = true,
+                disable = { "lua" },
+            },
 
             -- ensure these language parsers are installed
             ensure_installed = {
