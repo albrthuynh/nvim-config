@@ -28,11 +28,6 @@ keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" }
 
 keymap.set("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
 
--- switch pane focus
-keymap.set("n", "<leader>wh", "<C-w>h", { desc = "Focus left pane" })
-keymap.set("n", "<leader>wj", "<C-w>j", { desc = "Focus below pane" })
-keymap.set("n", "<leader>wk", "<C-w>k", { desc = "Focus above pane" })
-keymap.set("n", "<leader>wl", "<C-w>l", { desc = "Focus right pane" })
 keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" })
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" })
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
