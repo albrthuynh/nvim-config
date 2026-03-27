@@ -17,6 +17,7 @@ return {
 
             -- Biome does NOT format Python/Lua/C++; keep good native tools here.
             lua = { "stylua" },
+            python = { "black" },
             cpp = { "clang_format" },
         },
 
