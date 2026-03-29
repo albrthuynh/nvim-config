@@ -1,8 +1,8 @@
 return {
     {
-        "catppuccin/nvim",
+        -- "catppuccin/nvim",
         -- "ellisonleao/gruvbox.nvim",
-        -- "folke/tokyonight.nvim",
+        "folke/tokyonight.nvim",
         priority = 1000, -- make sure to load this before all the other start plugins
         config = function()
             -- local bg = "#011628"
@@ -36,9 +36,9 @@ return {
             --     end,
             -- })
             -- -- load the colorscheme here
-            -- vim.cmd([[colorscheme tokyonight]])
+            vim.cmd([[colorscheme tokyonight]])
             -- vim.cmd([[colorscheme gruvbox]])
-            vim.cmd([[colorscheme catppuccin]])
+            -- vim.cmd([[colorscheme catppuccin]])
         end,
     },
 }
