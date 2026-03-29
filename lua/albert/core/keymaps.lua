@@ -8,6 +8,7 @@ keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- Move to last non-blank character instead of the absolute end of line
 keymap.set({ "n", "v" }, "$", "g_", { desc = "Go to last non-blank character" })
+keymap.set({ "n", "v", "o" }, "0", "^", { desc = "Go to the first non-whitespace character" })
 
 -- increment/decrement numbers
 keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" })
