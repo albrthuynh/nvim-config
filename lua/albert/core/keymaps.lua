@@ -6,7 +6,8 @@ keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
-keymap.set({ "n", "v" }, "$", "g_", { desc = "Go to last non-blank character" }) -- Remap '$' in normal and visual mode to go to the last non-blank character of the line
+keymap.set({ "n", "v" }, "$", "g_", { desc = "Go to last non-blank character" })
+keymap.set({ "n", "v" }, "0", "^", { desc = "Go to first non-blank character" })
 
 -- increment/decrement numbers
 keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" })
