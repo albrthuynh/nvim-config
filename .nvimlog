@@ -1,0 +1,3 @@
+WRN 2026-04-01T14:46:52.164 ?.61238    server_start:193: Failed to start server: operation not permitted: /var/folders/rm/cj_j5kw90rz6980t_xqbpq_00000gn/T/nvim.albert/Da6xOR/nvim.61238.0
+WRN 2026-04-01T14:47:43.620 ?.62245    server_start:193: Failed to start server: operation not permitted: /var/folders/rm/cj_j5kw90rz6980t_xqbpq_00000gn/T/nvim.albert/BNB728/nvim.62245.0
+WRN 2026-04-01T14:47:48.285 ?.62351    server_start:193: Failed to start server: operation not permitted: /var/folders/rm/cj_j5kw90rz6980t_xqbpq_00000gn/T/nvim.albert/CcyXif/nvim.62351.0
