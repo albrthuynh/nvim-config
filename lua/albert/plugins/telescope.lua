@@ -22,6 +22,12 @@ return {
           },
         },
       },
+      pickers = {
+        find_files = {
+          hidden = true,
+          no_ignore = true,
+        },
+      },
     })
 
     telescope.load_extension("fzf")
@@ -36,4 +42,3 @@ return {
     keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
   end,
 }
-
