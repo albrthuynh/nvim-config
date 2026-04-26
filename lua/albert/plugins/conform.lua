@@ -3,10 +3,16 @@ return {
     event = { "BufWritePre" },
     opts = {
         -- Format on save using Conform (falls back to LSP if no formatter)
-        format_on_save = {
-            timeout_ms = 500,
-            lsp_format = "fallback",
-        },
+        format_on_save = function(bufnr)
+            if vim.bo[bufnr].filetype == "c" then
+                return nil
+            end
+
+            return {
+                timeout_ms = 500,
+                lsp_format = "fallback",
+            }
+        end,
 
         formatters_by_ft = {
             -- Biome: JS/TS ecosystem

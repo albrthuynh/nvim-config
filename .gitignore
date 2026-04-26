@@ -4,3 +4,4 @@
 *.backup
 plugin/packer_compiled.lua
 site/pack/*
+.codex
