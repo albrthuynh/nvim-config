@@ -48,60 +48,11 @@ return {
                 virt_text_pos = "eol_right_align",
                 format = function(diag)
                     local msg = diag.message:gsub("\n", " "):gsub("%s+", " ")
-                    return (#msg > 50) and (msg:sub(1, 50) .. "…") or msg
+                    return (#msg > max_inline) and (msg:sub(1, max_inline) .. "…") or msg
                 end,
             },
             update_in_insert = false,
             severity_sort = true,
-        })
-
-        -- === Improved diagnostic hover: auto-show + auto-close ===
-        vim.opt.updatetime = 1000 -- CursorHold fires after this ms
-
-        local diag_group = vim.api.nvim_create_augroup("DiagnosticHover", { clear = true })
-        local last_diag_win = nil
-
-        -- Show diagnostic float when cursor rests
-        vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-            group = diag_group,
-            callback = function()
-                local bufnr = vim.api.nvim_get_current_buf()
-                local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-                local diags = vim.diagnostic.get(bufnr, { lnum = line })
-
-                -- Close any previous diagnostic float first (prevents stacking)
-                if last_diag_win and vim.api.nvim_win_is_valid(last_diag_win) then
-                    vim.api.nvim_win_close(last_diag_win, true)
-                    last_diag_win = nil
-                end
-
-                if #diags > 0 then
-                    local float_opts = {
-                        scope = "line",
-                        focus = false,
-                        border = "rounded", -- optional: nicer look
-                        max_width = 100, -- optional: prevent super wide floats
-                        header = "", -- optional: clean look
-                        prefix = "",
-                    }
-                    local res = vim.diagnostic.open_float(float_opts)
-                    -- open_float can return winid (number) or { winid = number } depending on Neovim version
-                    if res then
-                        last_diag_win = type(res) == "number" and res or res.winid
-                    end
-                end
-            end,
-        })
-
-        -- Close diagnostic float when cursor moves
-        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-            group = diag_group,
-            callback = function()
-                if last_diag_win and vim.api.nvim_win_is_valid(last_diag_win) then
-                    vim.api.nvim_win_close(last_diag_win, true)
-                    last_diag_win = nil
-                end
-            end,
         })
 
         -- LspAttach keymaps
