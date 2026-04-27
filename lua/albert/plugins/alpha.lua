@@ -111,6 +111,8 @@ return {
 
         -- Header
         dashboard.section.header.val = render_donut(0, 0)
+        dashboard.section.header.opts.hl = "AlphaDonut"
+        vim.api.nvim_set_hl(0, "AlphaDonut", { fg = "#b8d7f0" })
 
         -- Buttons
         dashboard.section.buttons.val = {

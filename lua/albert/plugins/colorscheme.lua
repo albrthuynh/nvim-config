@@ -1,8 +1,13 @@
 return {
     {
-        "catppuccin/nvim",
-        name = "catppuccin",
+        -- "catppuccin/nvim",
+        -- name = "catppuccin",
         -- "ellisonleao/gruvbox.nvim",
+        -- "folke/tokyonight.nvim",
+        -- "rose-pine/neovim",
+        -- name = "rose-pine",
+        -- "rebelot/kanagawa.nvim",
+        "EdenEast/nightfox.nvim",
         priority = 1000, -- make sure to load this before all the other start plugins
         config = function()
             -- local bg = "#011628"
@@ -36,8 +41,12 @@ return {
             --     end,
             -- })
             -- -- load the colorscheme here
-            vim.cmd([[colorscheme catppuccin]])
+            -- vim.cmd([[colorscheme catppuccin]])
             -- vim.cmd([[colorscheme gruvbox]])
+            -- vim.cmd([[colorscheme tokyonight]])
+            -- vim.cmd([[colorscheme rose-pine]])
+            -- vim.cmd([[colorscheme kanagawa]])
+            vim.cmd([[colorscheme nightfox]])
         end,
     },
 }
