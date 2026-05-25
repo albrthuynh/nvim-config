@@ -28,6 +28,7 @@ return {
                 "pylint",
                 "eslint_d",
                 "cpplint",
+                "clang-format",
             },
         })
     end,
