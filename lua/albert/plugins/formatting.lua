@@ -1,3 +1,29 @@
+local clang_format_style = table.concat({
+  "{BasedOnStyle: LLVM",
+  "IndentWidth: 2",
+  "ContinuationIndentWidth: 4",
+  "ColumnLimit: 100",
+  "PointerAlignment: Left",
+  "BinPackArguments: false",
+  "BinPackParameters: OnePerLine",
+  "AllowAllArgumentsOnNextLine: false",
+  "AlignAfterOpenBracket: false",
+  "Cpp11BracedListStyle: Block",
+  "BreakBeforeBraces: Attach",
+  "AllowShortBlocksOnASingleLine: Never",
+  "AllowShortFunctionsOnASingleLine: None",
+  "AllowShortLambdasOnASingleLine: None",
+  "AllowShortIfStatementsOnASingleLine: Never",
+  "AllowShortLoopsOnASingleLine: false}",
+}, ", ")
+
+local function has_clang_format_file(filename)
+  return #vim.fs.find({ ".clang-format", "_clang-format" }, {
+    path = vim.fs.dirname(filename),
+    upward = true,
+  }) > 0
+end
+
 return {
   "stevearc/conform.nvim",
   event = { "BufWritePre" },
@@ -9,7 +35,7 @@ return {
         return nil
       end
       return {
-        timeout_ms = 3000,
+        timeout_ms = 10000,
         lsp_format = "fallback",
       }
     end,
@@ -29,10 +55,12 @@ return {
 
     formatters = {
       clang_format = {
-        prepend_args = {
-          "--style=file",
-          "--fallback-style={BasedOnStyle: LLVM, IndentWidth: 2, ContinuationIndentWidth: 4, ColumnLimit: 100, PointerAlignment: Left, BinPackArguments: false, BinPackParameters: false, AllowAllArgumentsOnNextLine: false, AlignAfterOpenBracket: DontAlign, Cpp11BracedListStyle: false, BreakBeforeBraces: Attach, AllowShortBlocksOnASingleLine: Never, AllowShortFunctionsOnASingleLine: None, AllowShortLambdasOnASingleLine: None, AllowShortIfStatementsOnASingleLine: Never, AllowShortLoopsOnASingleLine: false}",
-        },
+        prepend_args = function(_, ctx)
+          if has_clang_format_file(ctx.filename) then
+            return { "--style=file" }
+          end
+          return { "--style=" .. clang_format_style }
+        end,
       },
     },
 
