@@ -41,13 +41,13 @@ return {
     end,
 
     formatters_by_ft = {
-      -- Biome: JS/TS ecosystem
-      javascript = { "biome" },
-      javascriptreact = { "biome" },
-      typescript = { "biome" },
-      typescriptreact = { "biome" },
+      -- Prettier reads project config files like .prettierrc automatically.
+      javascript = { "prettier" },
+      javascriptreact = { "prettier" },
+      typescript = { "prettier" },
+      typescriptreact = { "prettier" },
+      svelte = { "prettier" },
 
-      -- Biome does NOT format Python/Lua/C++; keep good native tools here.
       lua = { "stylua" },
       python = { "black" },
       cpp = { "clang_format" },
