@@ -9,6 +9,57 @@ return {
   config = function()
     local telescope = require("telescope")
     local actions = require("telescope.actions")
+    local common_dotfile_globs = {
+      ".env*",
+      ".dockerignore",
+      ".editorconfig",
+      ".eslintignore",
+      ".eslintrc*",
+      ".gitattributes",
+      ".gitignore",
+      ".gitmodules",
+      ".npmrc",
+      ".nvmrc",
+      ".node-version",
+      ".prettierignore",
+      ".prettierrc*",
+      ".stylelintignore",
+      ".stylelintrc*",
+      ".yarnrc",
+    }
+    local generated_directory_globs = {
+      ".git",
+      ".cache",
+      ".next",
+      ".nuxt",
+      "build",
+      "coverage",
+      "dist",
+      "node_modules",
+      "target",
+      "vendor",
+    }
+    local find_files_command
+
+    if vim.fn.executable("rg") == 1 then
+      find_files_command = {
+        "rg",
+        "--files",
+        "--hidden",
+        "--glob",
+        "*",
+        "--glob",
+        "!.*",
+      }
+
+      for _, glob in ipairs(common_dotfile_globs) do
+        vim.list_extend(find_files_command, { "--glob", glob })
+      end
+
+      for _, glob in ipairs(generated_directory_globs) do
+        vim.list_extend(find_files_command, { "--glob", "!" .. glob .. "/**", "--glob", "!**/" .. glob .. "/**" })
+      end
+    end
 
     telescope.setup({
       defaults = {
@@ -23,8 +74,7 @@ return {
       },
       pickers = {
         find_files = {
-          hidden = true,
-          no_ignore = true,
+          find_command = find_files_command,
         },
       },
     })
