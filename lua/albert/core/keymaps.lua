@@ -33,3 +33,8 @@ keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" 
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" })
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" })
+
+-- print current filepath
+vim.keymap.set("n", "<leader>fp", function()
+  vim.notify(vim.fn.expand("%"), vim.log.levels.INFO, { title = "Current file" })
+end, { desc = "Show current file path" })
