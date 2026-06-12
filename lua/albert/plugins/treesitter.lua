@@ -33,7 +33,7 @@ return {
             "json", "javascript", "typescript", "tsx", "yaml", "html", "css",
             "prisma", "markdown", "markdown_inline", "svelte", "graphql",
             "bash", "lua", "vim", "dockerfile", "gitignore", "query",
-            "vimdoc", "c", "cpp", "java",
+            "vimdoc", "c", "cpp", "java", "python",
         }
 
         require("nvim-ts-autotag").setup()

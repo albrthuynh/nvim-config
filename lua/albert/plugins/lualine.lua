@@ -55,6 +55,13 @@ return {
                 theme = my_lualine_theme,
             },
             sections = {
+                lualine_c = {
+                    {
+                        "filename",
+                        path = 1, -- show path relative to cwd
+                        shorting_target = 40,
+                    },
+                },
                 lualine_x = {
                     {
                         lazy_status.updates,
