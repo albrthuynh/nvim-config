@@ -10,7 +10,12 @@ return {
 
     nvimtree.setup({
       view = {
-        width = 35,
+        -- Grow to fit the longest visible tree entry, while keeping a
+        -- comfortable minimum width.
+        width = {
+          min = 35,
+          max = -1,
+        },
         relativenumber = true,
       },
       -- change folder arrow icons
