@@ -19,11 +19,5 @@ return {
 
         vim.api.nvim_set_keymap("n", "<S-t>", "<cmd>ToggleTerm<CR>", { noremap = true, silent = true })
         vim.api.nvim_set_keymap("n", "<S-t>", "<cmd>ToggleTerm direction=float<CR>", { noremap = true, silent = true })
-        vim.api.nvim_set_keymap(
-            "n",
-            "<C-v>",
-            "<cmd>ToggleTerm size=40 direction=vertical<CR>",
-            { noremap = true, silent = true }
-        )
     end,
 }
